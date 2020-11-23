@@ -4,9 +4,13 @@ namespace DevDojo\Chatter;
 
 use Illuminate\Support\ServiceProvider;
 use Mews\Purifier\PurifierServiceProvider;
+use Illuminate\Routing\Router;
 
 class ChatterServiceProvider extends ServiceProvider
 {
+
+		public $publishRouteFile = '/routes/chatter/web.php';
+
     /**
      * Bootstrap the application services.
      *
@@ -35,8 +39,11 @@ class ChatterServiceProvider extends ServiceProvider
             __DIR__.'/Lang' => resource_path('lang/vendor/chatter'),
         ], 'chatter_lang');
 
-        // include the routes file
-        include __DIR__.'/Routes/web.php';
+				$this->publishes([
+						__DIR__.'/Routes' => base_path('routes/chatter'),
+				], 'chatter_routes');
+
+				$this->setupRoutes($this->app->router);
     }
 
     /**
@@ -59,4 +66,11 @@ class ChatterServiceProvider extends ServiceProvider
 
         $this->loadViewsFrom(__DIR__.'/Views', 'chatter');
     }
+
+		public function setupRoutes(Router $router)
+		{
+				if (file_exists(base_path().$this->publishRouteFile)) {
+						$this->loadRoutesFrom(base_path().$this->publishRouteFile);
+				}
+		}
 }
